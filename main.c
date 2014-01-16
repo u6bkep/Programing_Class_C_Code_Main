@@ -98,7 +98,44 @@ _FICD
     ICS_PGx3        // ICD Pin Placement Select (EMUC/EMUD share PGC3/PGD3)
 )
 
+// declare table
+unsigned int LookupTable[10] = {0x3f00, 0x0600, 0x5B00, 0x4f00, 0x6600,
+0x6D00,0x7D00, 0x0700, 0x7F00, 0x6F00};
+
+// declare variables
+
+  int NextTime = 7812;
+  int Number = 0;
+
+
 int main(void)
 {
 
+
+// setup outputes
+    TRISAbits.TRISA0 = 0;
+    TRISB = 0;
+
+// configure timer
+    PR1 = 0xFFFF;
+    T1CON = 0x8030;
+    TMR1 = 0;
+
+//main program loop
+    while(1)
+    {
+        // if number = 10, reset to 0
+        if (Number == 10)
+        {Number = 0;}
+
+        // read timer
+        if ((NextTime - (signed int) TMR1) <= 0)
+        {
+           NextTime = NextTime + 0x1E84;     // add to Next Time
+           LATAbits.LATA0 ^= 1;              // Toggle the LED
+           LATB = LookupTable[Number];       // write to display
+           Number = Number + 1;              // increment Number
+        }
+    }
+    
 }
